@@ -1,77 +1,63 @@
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { getBookById } from '../lib/api';
-import { getCoverURL } from '../lib/utils';
+import { Link } from "expo-router";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { getCoverURL, getId } from "../lib/utils";
 
-export default function DetailsScreen() {
-  const [book, setBook] = useState({});
-  const { bookId } = useLocalSearchParams();
-
-  useEffect(() => {
-    getBookById(bookId).then((data) => {
-      setBook(data);
-      console.log(data);
-    });
-  }, [bookId]);
-
+export function BookCard({ book }) {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={{ uri: getCoverURL(book.covers?.[0]) }}
-        style={styles.cover}
-      />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{book.title}</Text>
-        <Text style={styles.author}>{book.author}</Text>
-        <Text style={styles.description}>{book.description}</Text>
-      </View>
-    </ScrollView>
+    <View style={styles.row}>
+      <Link href={`./DetailScreen?id=${getId(book)}`} asChild>
+        <Pressable>
+          <View style={styles.container}>
+            <Text style={styles.title}>{book.title}</Text>
+            <Text style={styles.author}>{book.author_name.join(", ")}</Text>
+            <Image
+              source={{ uri: getCoverURL(book.cover_i, "M") }}
+              style={styles.cover}
+            />
+          </View>
+        </Pressable>
+      </Link>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  row: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 20,
-  },
-  cover: {
-    width: '100%',
-    height: 300,
-    resizeMode: 'contain',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  detailsContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    shadowRadius: 8,
+    elevation: 5,
+    padding: 10,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    alignItems: "center",
+    width: 200,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#333',
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+    color: "#333",
   },
   author: {
-    fontSize: 18,
-    fontStyle: 'italic',
-    marginBottom: 15,
-    color: '#555',
+    fontSize: 14,
+    fontStyle: "italic",
+    color: "#666",
+    marginBottom: 10,
   },
-  description: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    lineHeight: 22,
-    marginHorizontal: 10,
+  cover: {
+    width: 120,
+    height: 180,
+    resizeMode: "cover",
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });
