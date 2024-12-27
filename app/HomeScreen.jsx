@@ -1,33 +1,85 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, Pressable, Image } from 'react-native';
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 
-import { BookCard } from '../componentes/BookCard'
-import { Link } from 'expo-router';
-import { getBookById, searchBooks } from '../lib/api';
+import { Link } from "expo-router";
+import { BookCard } from "../componentes/BookCard";
+import { searchBooks } from "../lib/api";
+
+const NUMBER_OF_RESULTS = 25;
 
 export default function HomeScreen() {
   const [books, setBooks] = useState([]);
+  const [numColumns, setNumColumns] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    searchBooks('bestsellers', 10).then((bestsellers) => {;
+    // Function to update numColumns based on width
+    const updateNumColumns = () => {
+      const { width } = Dimensions.get("window");
+      console.log("Width:", width);
+      if (width > 868) {
+        setNumColumns(4);
+      } else if (width > 480) {
+        setNumColumns(3);
+      } else {
+        setNumColumns(1);
+      }
+    };
+
+    // Update columns initially
+    updateNumColumns();
+
+    // Add listener for screen size changes
+    const subscription = Dimensions.addEventListener(
+      "change",
+      updateNumColumns
+    );
+
+    // Cleanup the listener on unmount
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  // Get bestsellers on first render
+  useEffect(() => {
+    searchBooks("bestsellers", NUMBER_OF_RESULTS).then((bestsellers) => {
       setBooks(bestsellers.docs);
+      setIsLoading(false);
     });
   }, []);
 
   return (
-      <View style={styles.container}>
-        <Link asChild href={"./SearchScreen"}>
-          <Pressable style={styles.searchButton}>
-            <Image style={styles.searchIcon} source={ "../assets/black-search-icon.png" } />
-          </Pressable>
-        </Link>
+    <View style={styles.container}>
+      <Link asChild href={"./SearchScreen"}>
+        <Pressable style={styles.searchButton}>
+          <Image
+            style={styles.searchIcon}
+            source={require("../assets/black-search-icon.png")}
+          />
+        </Pressable>
+      </Link>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#000" style={styles.spinner} />
+      ) : (
         <FlatList
           data={books}
           renderItem={({ item }) => <BookCard book={item} />}
-          keyExtractor={item => item.key}
+          keyExtractor={(item) => item.key}
+          numColumns={numColumns}
+          key={numColumns} // Add key to trigger re-render on column change
           contentContainerStyle={styles.listContent}
-          verticall
         />
+      )}
     </View>
   );
 }
@@ -35,7 +87,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   listContent: {
     padding: 16,
@@ -46,6 +98,11 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   searchButton: {
-    backgroundColor: '#ccc'
-  }
+    backgroundColor: "#ccc",
+  },
+  spinner: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
