@@ -8,10 +8,12 @@ export function BookCard({ book }) {
       <Link href={`./DetailScreen?id=${getId(book)}`} asChild>
         <Pressable>
           <View style={styles.container}>
-            <Text style={styles.title}>{book.title}</Text>
-            <Text style={styles.author}>{book.author_name.join(", ")}</Text>
+            <Text style={styles.title}>{book?.title}</Text>
+            <Text style={styles.author}>
+              {(book?.author_name || []).join(", ")}
+            </Text>
             <Image
-              source={{ uri: getCoverURL(book.cover_i, "M") }}
+              source={{ uri: getCoverURL(book?.cover_i, "M") }}
               style={styles.cover}
             />
           </View>
