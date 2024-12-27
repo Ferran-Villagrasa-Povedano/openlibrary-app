@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   StyleSheet,
+  ToastAndroid,
   View,
 } from "react-native";
 
@@ -17,12 +18,15 @@ export default function HomeScreen() {
   const [books, setBooks] = useState([]);
   const [numColumns, setNumColumns] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("bestsellers");
 
+  // Function to update numColumns based on screen width
   useEffect(() => {
-    // Function to update numColumns based on width
     const updateNumColumns = () => {
       const { width } = Dimensions.get("window");
-      console.log("Width:", width);
       if (width > 868) {
         setNumColumns(4);
       } else if (width > 480) {
@@ -32,43 +36,70 @@ export default function HomeScreen() {
       }
     };
 
-    // Update columns initially
     updateNumColumns();
 
-    // Add listener for screen size changes
     const subscription = Dimensions.addEventListener(
       "change",
       updateNumColumns
     );
 
-    // Cleanup the listener on unmount
     return () => {
       subscription.remove();
     };
   }, []);
 
-  // Get bestsellers on first render
-  useEffect(() => {
-    searchBooks("bestsellers", NUMBER_OF_RESULTS).then((bestsellers) => {
-      setBooks(bestsellers.docs);
-      setIsLoading(false);
-    });
-  }, []);
-
-  const onSearch = (query) => {
-    console.log(query);
+  // Function to fetch books
+  const fetchBooks = (query, page) => {
     setIsLoading(true);
-    searchBooks(query, NUMBER_OF_RESULTS).then((results) => {
-      setBooks(results.docs);
-      setIsLoading(false);
-    });
+    searchBooks({ q: query, limit: NUMBER_OF_RESULTS, page: page })
+      .then((results) => {
+        setBooks((prevBooks) =>
+          page === 1 ? results.docs : [...prevBooks, ...results.docs]
+        );
+        setIsLoading(false);
+        setIsRefreshing(false);
+        setLoadingMore(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        setLoadingMore(false);
+        ToastAndroid.show("Error fetching books", ToastAndroid.SHORT);
+      });
+  };
+
+  // Handle initial search and subsequent fetch
+  useEffect(() => {
+    fetchBooks(query, page);
+  }, [query, page]);
+
+  // Handle search query change
+  const handleSearch = (query) => {
+    setQuery(query);
+    setPage(1);
+    setBooks([]);
+    fetchBooks(query, 1);
+  };
+
+  // Handle pull-to-refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchBooks(query, 1);
+  };
+
+  // Handle infinite scroll when reaching the end
+  const handleEndReached = () => {
+    if (!loadingMore && !isLoading) {
+      setLoadingMore(true);
+      setPage((prevPage) => prevPage + 1);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <SearchBar onSearch={onSearch} />
+      <SearchBar onSearch={handleSearch} />
 
-      {isLoading ? (
+      {isLoading && page === 1 ? (
         <ActivityIndicator size="large" color="#000" style={styles.spinner} />
       ) : (
         <FlatList
@@ -76,8 +107,21 @@ export default function HomeScreen() {
           renderItem={({ item }) => <BookCard book={item} />}
           keyExtractor={(item) => item.key}
           numColumns={numColumns}
-          key={numColumns} // Add key to trigger re-render on column change
+          key={numColumns}
           contentContainerStyle={styles.listContent}
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5} // Trigger loading more when 50% of the list is visible
+          ListFooterComponent={
+            loadingMore ?? (
+              <ActivityIndicator
+                size="large"
+                color="#000"
+                style={styles.spinner}
+              />
+            )
+          }
         />
       )}
     </View>
@@ -91,14 +135,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-  },
-  searchIcon: {
-    width: 20,
-    height: 20,
-    padding: 10,
-  },
-  searchButton: {
-    backgroundColor: "#ccc",
   },
   spinner: {
     flex: 1,
