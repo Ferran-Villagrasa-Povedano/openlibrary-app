@@ -1,0 +1,71 @@
+{
+  "authors": [
+    {
+      "key": "/authors/OL18319A"
+    }
+  ],
+  "by_statement": "Mark Twain ; with an introduction by Robert S. Tilton.",
+  "classifications": {},
+  "covers": [11403183],
+  "created": {
+    "type": "/type/datetime",
+    "value": "2008-04-01T03:28:50.625462"
+  },
+  "dewey_decimal_class": ["813/.4"],
+  "genres": ["Fiction."],
+  "identifiers": {
+    "goodreads": ["1929684"],
+    "librarything": ["2236"],
+    "project_gutenberg": ["74"]
+  },
+  "isbn_10": ["0451526538"],
+  "key": "/books/OL1017798M",
+  "languages": [
+    {
+      "key": "/languages/eng"
+    }
+  ],
+  "last_modified": {
+    "type": "/type/datetime",
+    "value": "2021-10-08T20:02:44.638815"
+  },
+  "latest_revision": 14,
+  "lc_classifications": ["PS1306 .A1 1997", "PS1306.A1 1997"],
+  "lccn": ["96072233"],
+  "notes": "Includes bibliographical references (p. 213-216).",
+  "number_of_pages": 216,
+  "ocaid": "adventuresoftoms0000twai_x3x4",
+  "oclc_numbers": ["36792831"],
+  "pagination": "xxi, 216 p. ;",
+  "publish_country": "nyu",
+  "publish_date": "1997",
+  "publish_places": ["New York"],
+  "publishers": ["Signet Classic"],
+  "revision": 14,
+  "source_records": [
+    "marc:marc_records_scriblio_net/part25.dat:213801824:997",
+    "marc:marc_loc_updates/v40.i23.records.utf8:2463307:1113",
+    "amazon:0451526538",
+    "marc:marc_loc_2016/BooksAll.2016.part25.utf8:119958799:1113",
+    "ia:adventuresoftoms0000twai_x3x4",
+    "bwb:9780451526533"
+  ],
+  "subject_place": ["Mississippi River Valley", "Missouri"],
+  "subjects": [
+    "Sawyer, Tom (Fictitious character) -- Fiction",
+    "Runaway children -- Fiction",
+    "Child witnesses -- Fiction",
+    "Boys -- Fiction",
+    "Mississippi River Valley -- Fiction",
+    "Missouri -- Fiction"
+  ],
+  "title": "The adventures of Tom Sawyer",
+  "type": {
+    "key": "/type/edition"
+  },
+  "works": [
+    {
+      "key": "/works/OL53919W"
+    }
+  ]
+}
