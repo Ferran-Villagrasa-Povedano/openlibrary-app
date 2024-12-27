@@ -114,13 +114,13 @@ export default function HomeScreen() {
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5} // Trigger loading more when 50% of the list is visible
           ListFooterComponent={
-            loadingMore ?? (
+            loadingMore ? (
               <ActivityIndicator
                 size="large"
                 color="#000"
                 style={styles.spinner}
               />
-            )
+            ) : null
           }
         />
       )}
