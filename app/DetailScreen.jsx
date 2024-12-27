@@ -9,8 +9,7 @@ import {
   View,
 } from "react-native";
 import { getAuthorDetails, getBookDetails } from "../lib/api";
-import { getCoverURL } from "../lib/utils";
-import { getId } from "./../lib/utils";
+import { getCoverURL, getId } from "./../lib/utils";
 
 export default function DetailsScreen() {
   const [book, setBook] = useState(null);
@@ -19,7 +18,6 @@ export default function DetailsScreen() {
 
   useEffect(() => {
     getBookDetails(id).then((data) => {
-      console.log(data);
       setBook(data);
 
       data.authors.forEach((authorObj) => {
@@ -51,7 +49,9 @@ export default function DetailsScreen() {
             ? authors.map((author) => author.name).join(", ")
             : "Loading authors..."}
         </Text>
-        <Text style={styles.description}>{book.description}</Text>
+        <Text style={styles.description}>
+          {book.description?.value || book.description}
+        </Text>
       </View>
     </ScrollView>
   );
