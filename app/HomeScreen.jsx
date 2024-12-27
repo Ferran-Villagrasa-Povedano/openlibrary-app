@@ -3,14 +3,12 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Image,
-  Pressable,
   StyleSheet,
   View,
 } from "react-native";
 
-import { Link } from "expo-router";
 import { BookCard } from "../componentes/BookCard";
+import { SearchBar } from "../componentes/SearchBar";
 import { searchBooks } from "../lib/api";
 
 const NUMBER_OF_RESULTS = 25;
@@ -57,16 +55,18 @@ export default function HomeScreen() {
     });
   }, []);
 
+  const onSearch = (query) => {
+    console.log(query);
+    setIsLoading(true);
+    searchBooks(query, NUMBER_OF_RESULTS).then((results) => {
+      setBooks(results.docs);
+      setIsLoading(false);
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <Link asChild href={"./SearchScreen"}>
-        <Pressable style={styles.searchButton}>
-          <Image
-            style={styles.searchIcon}
-            source={require("../assets/black-search-icon.png")}
-          />
-        </Pressable>
-      </Link>
+      <SearchBar onSearch={onSearch} />
 
       {isLoading ? (
         <ActivityIndicator size="large" color="#000" style={styles.spinner} />
